@@ -1,9 +1,8 @@
 $(document).ready(function () {
-  var items = [];
-  var itemsRaw = [];
+  let items = [];
+  let itemsRaw = [];
 
   $.getJSON("/api/books", function (data) {
-    //var items = [];
     itemsRaw = data;
     $.each(data, function (i, val) {
       items.push(
@@ -27,11 +26,10 @@ $(document).ready(function () {
   });
 
   function commentlist(data) {
-    var comments = [];
-    // comments = [];
-    $.each(data.comments, function (i, val) {
-      comments.unshift("<li>" + val + "</li>");
-    });
+    let comments = [];
+    for (let i = data.comments.length - 1; i >= 0; i--) {
+      comments.push(`<li>${data.comments[i]}</li>`);
+    }
     comments.push(
       '<br><form id="newCommentForm"><input style="width:300px" type="text" class="form-control" id="commentToAdd" name="comment" placeholder="New Comment"></form>'
     );
@@ -82,8 +80,6 @@ $(document).ready(function () {
       dataType: "json",
       data: $("#newCommentForm").serialize(),
       success: function (data) {
-        // comments.unshift(newComment); //adds new comment to top of list
-        // $("#detailComments").html(comments.join(""));
         commentlist(data);
       },
     });

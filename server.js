@@ -19,8 +19,8 @@ try {
     useFindAndModify: false,
   });
   console.log("connected to database");
-} catch (e) {
-  console.error(e);
+} catch (err) {
+  console.error(err);
   throw new Error("Unable to Connect to Database");
 }
 
