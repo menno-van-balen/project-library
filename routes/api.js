@@ -87,16 +87,22 @@ module.exports = function (app) {
   app
     .route("/api/books/:id")
     .get(function (req, res) {
-      var bookid = req.params.id;
+      const bookid = req.params.id;
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
-      Book.findById(bookid, (err, book) => {
-        if (err) {
-          console.error(err);
-        } else {
-          const { _id, title, comments } = book;
-          res.json({ _id, title, comments });
-        }
-      });
+      if (bookid) {
+        Book.findById(bookid, (err, book) => {
+          if (err) {
+            console.error(err);
+          } else if (!book) {
+            res.json("error: bookid not in database");
+          } else {
+            const { _id, title, comments } = book;
+            res.json({ _id, title, comments });
+          }
+        });
+      } else {
+        res.json("error: no bookid");
+      }
     })
 
     .post(function (req, res) {
@@ -126,36 +132,27 @@ module.exports = function (app) {
               }
             );
           } else {
-            res.json("no book with this id in database");
+            res.json("error: bookid not in database");
           }
         })
         .catch((err) => {
           console.error(err);
-          res.json("no book with this id in database");
+          res.json("error: bookid not in database");
         });
     })
 
     .delete(function (req, res) {
       var bookid = req.params.id;
       //if successful response will be 'delete successful'
-      Book.findById(bookid)
-        .then((book) => {
-          if (book) {
-            Book.findByIdAndRemove(bookid, (err) => {
-              if (err) {
-                console.error(err);
-                res.json("could not delete this book from database");
-              } else {
-                res.json("delete successful");
-              }
-            });
-          } else {
-            res.json("no book with this id in database");
-          }
-        })
-        .catch((err) => {
+      Book.findByIdAndRemove(bookid, (err, book) => {
+        if (err) {
           console.error(err);
-          res.json("no book with this id in database");
-        });
+          res.json("no book exists");
+        } else if (!book) {
+          res.json("no book exists");
+        } else {
+          res.json("delete successful");
+        }
+      });
     });
 };
